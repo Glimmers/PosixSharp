@@ -301,15 +301,10 @@ namespace Posix
             return outField;
         }
 
-        private byte AsciiToEBCDIC(byte toConvert)
-        {
-            return _asciiToEBCDIC[toConvert];
-        }
+        private byte AsciiToEBCDIC(byte toConvert) => _asciiToEBCDIC[toConvert];
+        
+        private byte AsciiToIBM(byte toConvert) => _asciiToIBM[toConvert];
 
-        private byte AsciiToIBM(byte toConvert)
-        {
-            return _asciiToIBM[toConvert];
-        }
 
         private byte EBCDICToASCII(byte toConvert)
         {
@@ -318,7 +313,7 @@ namespace Posix
                 MakeEBCDICTable();
             }
             
-            return (_EBCDICToAscii.ContainsKey(toConvert)) ? _EBCDICToAscii[toConvert] : toConvert;
+            return _EBCDICToAscii[toConvert];
         }
 
         // We're almost always never going to need this, so we'll make it by converting only when it's actually used
@@ -329,42 +324,28 @@ namespace Posix
             {
                 _EBCDICToAscii.Add(_asciiToEBCDIC[n], (byte)n);
             }
+
+            // The upper 128 chars are the same in each set
+            for (int n = 128; n < 256; n++) _EBCDICToAscii.Add((byte)n, (byte)n);
         }
 
         private byte[] ConvertCharacters(byte[] toConvert)
         {
-            byte[] converted = new byte[toConvert.Length];
-            for (int i = 0; i < toConvert.Length; i++)
-            {
-                if (_ascii)
-                {
-                    converted[i] = EBCDICToASCII(toConvert[i]);
-                }
-                // Convert case while things are known to be ascii
-                if (_lcase)
-                {
-                    converted[i] = (byte)char.ToLower((char)toConvert[i]);
-                }
-                if (_ucase)
-                {
-                    converted[i] = (byte)char.ToUpper((char)toConvert[i]);
-                }
-                if (_ebcdic)
-                {
-                    converted[i] = AsciiToEBCDIC(toConvert[i]);
-                }
-                if (_ibm)
-                {
-                    converted[i] = AsciiToIBM(toConvert[i]);
-                }
-            }
+            byte[] converted;
 
-            if (_swab)
-            {
-                converted = SwapBytes(converted);
-            }
+            Func<byte, byte> converter = _ascii
+                ? (Func<byte, byte>)((t) => EBCDICToASCII(t))
+                : ((t) => t);
 
-            return converted;
+            if (_lcase) converter = (t) => (byte)char.ToLower((char)t);
+            else if (_ucase) converter = (t) => (byte)char.ToUpper((char)t);
+
+            if (_ebcdic) converter = (t) => AsciiToEBCDIC(t);
+            else if (_ibm) converter = (t) => AsciiToIBM(t);
+
+            converted = toConvert.Select(converter).ToArray();
+
+            return _swab ? SwapBytes(converted) : converted;
         }
 
     }

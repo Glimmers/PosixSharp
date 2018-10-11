@@ -9,38 +9,42 @@ namespace Posix
     partial class FileUtils
     {
 
-        static void Touch(string fileName, bool setAccess = true, bool setModification = false, bool dontCreate = false)
-        {
-            // If no arg's given, set date and time to now.
-            Touch(fileName, DateTime.Now, setAccess, setModification, dontCreate);
-        }
+        // If no arg's given, set date and time to now.
+        static void Touch(string FileName, bool SetAccess = true, 
+            bool SetModification = false, bool DontCreate = false) =>
+            Touch(FileName, DateTime.Now, SetAccess, SetModification, DontCreate);
 
-        static void Touch(string fileName, DateTime toSet, bool setAccess = true, bool setModification = false, bool dontCreate = false)
+        static void Touch(string FileName, DateTime ToSet,
+            bool SetAccess = true, bool SetModification = false,
+            bool DontCreate = false)
         {
-            if (File.Exists(fileName))
+            if (File.Exists(FileName))
             {
-                if (setAccess)
+                if (SetAccess)
                 {
-                    File.SetLastAccessTime(fileName, toSet);
+                    File.SetLastAccessTime(FileName, ToSet);
                 }
-                if (setModification)
+                if (SetModification)
                 {
-                    File.SetLastWriteTime(fileName, toSet);
+                    File.SetLastWriteTime(FileName, ToSet);
                 }
             }
             else
             {
-                if (!dontCreate)
+                if (!DontCreate)
                 {
-                    File.Create(fileName);
-                    Touch(fileName, toSet, setAccess, setModification, dontCreate);
+                    File.Create(FileName);
+                    Touch(FileName, ToSet, SetAccess, SetModification, DontCreate);
                 }
             }
         }
 
-        static void Touch(string fileName, string fileToMatch, bool setAccess = true, bool setModification = false, bool dontCreate = false)
+        static void Touch(string FileName, string FileToMatch, 
+            bool SetAccess = true, bool SetModification = false,
+            bool DontCreate = false)
         {
-            Touch(fileName, File.GetCreationTime(fileToMatch), setAccess, setModification, dontCreate);
+            Touch(FileName, File.GetCreationTime(FileToMatch), SetAccess,
+                SetModification, DontCreate);
         }
         
     }

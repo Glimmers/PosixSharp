@@ -5,12 +5,12 @@ using System.Text;
 
 namespace Posix.Executable
 {
-    public abstract class SignalledThread : Executable.ISignalable
+    public abstract class SignalledThread : ISignalable
     {
         private System.Threading.Thread _thread;
         Action<Signal> _signalHandler;
 
-        public virtual SignalledThread()
+        public SignalledThread()
         {
             _signalHandler = (Signal toSend) =>
             {
@@ -40,6 +40,8 @@ namespace Posix.Executable
                         break;
                 }
             };
+
+
         }
 
         public virtual System.Threading.Thread Thread
@@ -62,6 +64,7 @@ namespace Posix.Executable
             }
         }
 
+        public abstract void HandleSignal(Signal toSend);
 
         public virtual void Start(object parameter)
         {

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Diagnostics;
 using System.Text;
 
 namespace Posix
@@ -21,7 +22,7 @@ namespace Posix
             }
             else
             {
-                System.Diagnostics.Process toRun = new System.Diagnostics.Process();
+                Process toRun = new Process();
                 toRun.StartInfo.FileName = command;
                 toRun.StartInfo.Arguments = arguments;
                 bool executed;
@@ -29,33 +30,47 @@ namespace Posix
                 
                 
                 // Save our old environment for restoration later
-                System.Collections.Specialized.StringDictionary oldEnvironment = (System.Collections.Specialized.StringDictionary)Environment.GetEnvironmentVariables();
+                var oldEnvironment = Environment.GetEnvironmentVariables();
+               
 
                 // Lock the environment until the process is started
-                lock (typeof(System.Environment))
+                lock (typeof(Environment))
                 {
+                    // Build our temporary environment
 
-                    // Build our temporary environment, keeping track of environment variables we need to unset
+                    // Track which keys we need to delete after the process runs
+                    var toDelete = vars.Keys.Where((t) => !oldEnvironment.Contains(t)).ToArray();
                     
-                    foreach (KeyValuePair<string, string> procVar in vars)
+                    // Delete the environment values which don't exist in the new environment
+                    foreach (string toCheck in Environment.GetEnvironmentVariables().Keys)
                     {
-                        // Add an empty key to our environment if it doesn't exist. When we restore the
-                        // environment, these empty keys will be deleted.
-                        if (!oldEnvironment.ContainsKey(procVar.Key))
-                        {
-                            oldEnvironment.Add(procVar.Key, "");
-                        }
-                        Environment.SetEnvironmentVariable(procVar.Key, procVar.Value);
+                        if (!vars.ContainsKey(toCheck)) Environment.SetEnvironmentVariable(toCheck, "");
                     }
-                    
-                    executed = toRun.Start(); // Run file, save whether we started up or not
 
-                    // File started, it has the environment, clean ourselves up
+                    // Dump in the new environment variables
+
+                    foreach (var pair in vars)
+                    {
+                        Environment.SetEnvironmentVariable(pair.Key, pair.Value);
+                    }
+
+                    executed = toRun.Start(); // Run file, getting a process descriptor
+
+                    // Program started, it has the environment, clean ourselves up
+
+                    // Set all the variables from our old environment
                     foreach (KeyValuePair<string, string> restoreVars in oldEnvironment)
                     {
                         Environment.SetEnvironmentVariable(restoreVars.Key, restoreVars.Value);
                     }
-                    
+
+                    // Clear the environment variables which were in our temporary environment which
+                    // aren't in the original environment
+                    foreach (var deleting in toDelete)
+                    {
+                        Environment.SetEnvironmentVariable(deleting, "");
+                    }
+
                 }
 
                 if (executed)

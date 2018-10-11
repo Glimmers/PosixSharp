@@ -17,7 +17,7 @@ namespace Posix
             }
             catch (Exception e)
             {
-                Posix.Stdio.perror("Unable to create directory: " + e.Message);
+                Stdio.perror("Unable to create directory: " + e.Message);
                 retVal = -1;
             }
             return retVal;
@@ -32,7 +32,7 @@ namespace Posix
             }
             catch (Exception e)
             {
-                Posix.Stdio.perror("Unable to delete file: " + e.Message);
+                Stdio.perror("Unable to delete file: " + e.Message);
                 retVal = -1;
             }
             return retVal;
@@ -48,7 +48,7 @@ namespace Posix
             }
             catch (Exception e)
             {
-                Posix.Stdio.perror("Unable to delete directory: " + e.Message);
+                Stdio.perror("Unable to delete directory: " + e.Message);
                 retVal = -1;
             }
 
