@@ -1,0 +1,5 @@
+C:\Users\Kes\Documents\Visual Studio 2010\Projects\Posix\Posix\bin\Debug\Posix.dll
+C:\Users\Kes\Documents\Visual Studio 2010\Projects\Posix\Posix\bin\Debug\Posix.pdb
+C:\Users\Kes\Documents\Visual Studio 2010\Projects\Posix\Posix\obj\Debug\Posix.dll
+C:\Users\Kes\Documents\Visual Studio 2010\Projects\Posix\Posix\obj\Debug\Posix.pdb
+C:\Users\Kes\Documents\Visual Studio 2010\Projects\Posix\Posix\obj\Debug\Posix.csprojResolveAssemblyReference.cache
