@@ -8,7 +8,6 @@ namespace Posix
 {
     public class HeadTail
     {
-
         private static byte[][] Head(byte[] input, int lines = 10)
         {
             List<byte[]> result = new List<byte[]>();
